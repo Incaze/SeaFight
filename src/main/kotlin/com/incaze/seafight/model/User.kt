@@ -10,9 +10,8 @@ data class User(
         var id: Long? = null,
         var username: String? = null,
         var password: String? = null,
-        @ElementCollection(targetClass = Role::class, fetch = FetchType.EAGER)
         @CollectionTable(name = "user_role", joinColumns = [JoinColumn(name = "user_id")])
         @Enumerated(EnumType.STRING)
         @Column(name = "role")
-        var roles: MutableList<Role>? = null
+        var roles: Role? = null
 )

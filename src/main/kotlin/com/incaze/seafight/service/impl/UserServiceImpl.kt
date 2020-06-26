@@ -1,6 +1,5 @@
 package com.incaze.seafight.service.impl
 
-import com.incaze.seafight.dto.UserDTO
 import com.incaze.seafight.model.Role
 import com.incaze.seafight.model.User
 import com.incaze.seafight.service.UserService
@@ -26,7 +25,7 @@ class UserServiceImpl : UserService {
             return "User ${user.username} already exists"
         }
         user.password = encoder.encode(user.password)
-        user.roles = mutableListOf(Role.USER)
+        user.roles = Role.USER
         userRepository.save(user)
         return "User ${user.username} created"
     }
