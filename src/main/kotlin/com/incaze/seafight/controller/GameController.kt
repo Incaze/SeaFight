@@ -51,7 +51,7 @@ class GameController {
         }
 
         val newGame = Game()
-        newGame.active = true
+        newGame.active = false
         newGame.createrUserID = getIDNotFinishedGamesUser.toLong()
         newGame.partUserID = getIDNotFinishedGamesOpponent.toLong()
         newGame.createrMap = ""
@@ -74,8 +74,12 @@ class GameController {
         val utils = Utils()
         val ship = Ship()
         val shipMap = ShipMap()
-        if (!game.active!!) {
-            return ResponseEntity("Game over", HttpStatus.BAD_REQUEST)
+        if (game.active!!) {
+            return ResponseEntity("Game is active", HttpStatus.BAD_REQUEST)
+        }
+
+        if (game.winnerUserID != (0).toLong()) {
+            return ResponseEntity("Game Over", HttpStatus.BAD_REQUEST)
         }
 
         val isCreatorUser = utils.isCreatorUser(user.id!!, gameRepository)
@@ -94,19 +98,101 @@ class GameController {
         val shipID = ship.getShipID(ship_type)
 
         if (isCreatorUser) {
-            val countUserShips = utils.convertMap(game.countCreaterShips, shipMap.getCountShipTypesFromNull())
+            val countUserShips = utils.convertMap(game.countCreaterShips, ship.getCountShipTypesFromNull())
             countUserShips[shipID!!] = (countUserShips[shipID]!!.toInt() + 1).toString()
             game.createrMap = gameMap
             game.countCreaterShips = countUserShips.toString()
         } else {
-            val countUserShips = utils.convertMap(game.countPartShips, shipMap.getCountShipTypesFromNull())
+            val countUserShips = utils.convertMap(game.countPartShips, ship.getCountShipTypesFromNull())
             countUserShips[shipID!!] = (countUserShips[shipID]!!.toInt() + 1).toString()
             game.partMap = gameMap
             game.countPartShips = countUserShips.toString()
+        }
+
+        val creatorIsFinishFillMap = shipMap.isMapFillFinished(game.countCreaterShips)
+        val partIsFinishFillMap = shipMap.isMapFillFinished(game.countPartShips)
+
+        if (creatorIsFinishFillMap && partIsFinishFillMap){
+            game.active = true
         }
         gameRepository.save(game)
         return ResponseEntity.ok("Ship inserted")
     }
 
+    @PatchMapping("{id}")
+    fun play(
+            @PathVariable id: Long,
+            @RequestBody x_axis: Int,
+            @RequestBody y_axis: Int,
+            @AuthenticationPrincipal user: User
+    ): ResponseEntity<Any>? {
 
+        val game: Game = gameRepository.findById(id).get()
+        val utils = Utils()
+        val ship = Ship()
+        val shipMap = ShipMap()
+        if(!game.active!!){
+            return ResponseEntity("Not active game", HttpStatus.BAD_REQUEST)
+        }
+        val isCreatorUser = utils.isCreatorUser(user.id!!, gameRepository)
+                ?: return ResponseEntity("You are not playing in game id = ${game.id}", HttpStatus.BAD_REQUEST)
+
+        if (game.moveUserID != user.id) {
+            return ResponseEntity("Not your move", HttpStatus.BAD_REQUEST)
+        }
+
+        var opponentMap : String
+        val opponentID : Long
+
+        if (isCreatorUser) {
+            opponentMap = game.partMap
+            opponentID = game.partUserID!!
+        } else {
+            opponentMap = game.createrMap
+            opponentID = game.createrUserID!!
+        }
+
+        val shot = shipMap.move(x_axis, y_axis, opponentMap)
+        val countUserShips : Array<String?>
+        val shipID : Int
+        var destroyed = false
+        when (shot) {
+            "Fail" -> {
+                game.moveUserID = opponentID
+                gameRepository.save(game)
+                return ResponseEntity.ok(shot)
+            }
+            "Destroyed" -> {
+                destroyed = true
+            }
+        }
+        shipID = shipMap.getShipIdByAxis(x_axis, y_axis, opponentMap)
+        countUserShips = utils.convertMap(opponentMap, ship.getCountShipTypesFromNull())
+        if (destroyed) {
+            countUserShips[shipID] = (countUserShips[shipID]!!.toInt() - 1).toString()
+        }
+        opponentMap = shipMap.applyMove(x_axis, y_axis, opponentMap)
+        if (isCreatorUser) {
+            game.partMap = opponentMap
+            game.countPartShips = countUserShips.toString()
+        } else {
+            game.createrMap = opponentMap
+            game.countCreaterShips = countUserShips.toString()
+        }
+
+        val gameOver = shipMap.isGameOver(countUserShips)
+
+        if(gameOver){
+            game.winnerUserID = user.id
+            game.active = false
+        }
+
+        gameRepository.save(game)
+
+        if(!game.active!!){
+            val winnerUserID = game.winnerUserID
+            return ResponseEntity("Game over - winner $winnerUserID", HttpStatus.BAD_REQUEST)
+        }
+        return ResponseEntity.ok(shot)
+    }
 }

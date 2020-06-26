@@ -7,7 +7,6 @@ class ShipMap {
 
     private val mapSize = 160
     private val mapLen = 10
-    private val countShipTypesFromNull = 5
 
     private val errors = mapOf(
             "Can't insert ship" to 1,
@@ -17,7 +16,7 @@ class ShipMap {
     fun tryInsertShip(xAxis: Int, yAxis: Int, shipType: String, userID: Long, game: Game, gameRepository : GameRepository, way: String) : String{
 
         val utils = Utils()
-
+        val ship = Ship()
         val isCreatorUser = utils.isCreatorUser(userID, gameRepository)
 
         val arrayMap: Array <String?>
@@ -25,17 +24,15 @@ class ShipMap {
 
         if (isCreatorUser!!) {
             arrayMap = utils.convertMap(game.createrMap, mapSize)
-            countUserShips = utils.convertMap(game.countCreaterShips, countShipTypesFromNull)
+            countUserShips = utils.convertMap(game.countCreaterShips, ship.getCountShipTypesFromNull())
         } else {
             arrayMap = utils.convertMap(game.partMap, mapSize)
-            countUserShips = utils.convertMap(game.countPartShips, countShipTypesFromNull)
+            countUserShips = utils.convertMap(game.countPartShips, ship.getCountShipTypesFromNull())
         }
         return insertShip(arrayMap, xAxis, yAxis, shipType, way, countUserShips)
     }
 
-    fun getCountShipTypesFromNull() : Int{
-        return countShipTypesFromNull
-    }
+
 
     private fun insertShip(arrayMap : Array<String?>, xAxis: Int, yAxis: Int, shipType: String, way: String, countUserShips: Array<String?>): String{
 
@@ -101,6 +98,66 @@ class ShipMap {
                 tmp += wayMapLen
             }
             return arrayMap.toString()
+    }
+
+    fun isMapFillFinished(countUserShips: String) : Boolean{
+        val utils = Utils()
+        val ship = Ship()
+        val ships = utils.convertMap(countUserShips, mapSize)
+        val countShips = ship.getCountShipTypesFromNull()
+        for (i in 1 until countShips){
+            if (ships[i]!!.toInt() != ship.getMaxCountShip(i)){
+                return false
+            }
+        }
+        return true
+    }
+
+    fun move(xAxis: Int, yAxis: Int, gameMap: String) : String{
+        val utils = Utils()
+        val arrayMap = utils.convertMap(gameMap, mapSize)
+        val index = yAxis * mapLen + xAxis
+
+        if (arrayMap[index] == "0") {
+            return "Fail"
+        }
+        val tmp = arrayMap[index]
+
+        if (arrayMap[index + 1] != tmp
+                || arrayMap[index - 1] != tmp
+                || arrayMap[index - mapLen] != tmp
+                || arrayMap[index + mapLen] != tmp
+                || arrayMap[index + 1] != "x"
+                || arrayMap[index - 1] != "x"
+                || arrayMap[index - mapLen] != "x"
+                || arrayMap[index + mapLen] != "x"
+        ){
+            return "Destroyed"
+        }
+        return "Hit"
+    }
+
+    fun applyMove(xAxis: Int, yAxis: Int, gameMap: String) : String {
+        val utils = Utils()
+        val arrayMap = utils.convertMap(gameMap, mapSize)
+        val index = yAxis * mapLen + xAxis
+        arrayMap[index] = "x"
+        return arrayMap.toString()
+    }
+
+    fun isGameOver(countUserShips: Array<String?>) : Boolean{
+        for (i in countUserShips.indices) {
+            if (countUserShips[i] != "0") {
+                return false
+            }
+        }
+        return true
+    }
+
+    fun getShipIdByAxis(xAxis: Int, yAxis: Int, gameMap: String) : Int {
+        val utils = Utils()
+        val arrayMap = utils.convertMap(gameMap, mapSize)
+        return arrayMap[yAxis * mapLen + xAxis]!!.toInt()
     }
 
     fun isMapError(str: String) : Boolean{

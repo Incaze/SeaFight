@@ -10,6 +10,8 @@ class Ship {
             "battleship" to 4
     )
 
+    private val countShipTypesFromNull = 5
+
     private val maxCountShip = mapOf(
             1 to 4,
             2 to 3,
@@ -27,5 +29,9 @@ class Ship {
 
     fun isExistShipType(shipName : String) : Boolean{
         return shipMap.containsKey(shipName)
+    }
+
+    fun getCountShipTypesFromNull() : Int{
+        return countShipTypesFromNull
     }
 }
