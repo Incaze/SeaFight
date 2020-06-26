@@ -46,7 +46,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
                 .dataSource(dataSource)
                 .passwordEncoder(bCryptPasswordEncoder())
                 .usersByUsernameQuery("select id, username, password from user where username=?")
-                .authoritiesByUsernameQuery("select u.username, ur.roles from user u inner join user_role ur " +
+                .authoritiesByUsernameQuery("select u.username, ur.role from user u inner join user_role ur " +
                         "on u.id = ur.user_id where u.username=?")
     }
 }
