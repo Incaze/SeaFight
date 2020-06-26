@@ -27,10 +27,10 @@ data class Game(
         @Column(name = "part_map")
         var partMap: String = "",
 
-        @Column(name = "countCreaterShips")
+        @Column(name = "count_creater_ships")
         var countCreaterShips: String = "",
 
-        @Column(name = "countPartShips")
+        @Column(name = "count_part_ships")
         var countPartShips: String = "",
 
         @Column(name = "winner_user_id")
