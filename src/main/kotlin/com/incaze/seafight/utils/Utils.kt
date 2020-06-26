@@ -1,7 +1,6 @@
 package com.incaze.seafight.utils
 
 import com.incaze.seafight.model.Game
-import com.incaze.seafight.model.User
 import com.incaze.seafight.repository.GameRepository
 
 class Utils {
@@ -39,5 +38,16 @@ class Utils {
             }
         }
         return 0
+    }
+
+    fun convertMap(userMap: String, size: Int): Array<String?> {
+        if (userMap == "") {
+            val arrayMap = arrayOfNulls<String>(size)
+            for (i in arrayMap.indices) {
+                arrayMap[i] = "0"
+            }
+            return arrayMap
+        }
+        return userMap.split(" ").toTypedArray()
     }
 }

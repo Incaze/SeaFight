@@ -1,5 +1,6 @@
 package com.incaze.seafight.model
 
+
 class Ship {
 
     private val shipMap = mapOf(
@@ -20,7 +21,11 @@ class Ship {
         return maxCountShip[shipID]!!
     }
 
-    fun getShipID(ShipName : String) : Int? {
+    fun getShipID(ShipName : String) : Int?{
         return shipMap[ShipName]
+    }
+
+    fun isExistShipType(shipName : String) : Boolean{
+        return shipMap.containsKey(shipName)
     }
 }

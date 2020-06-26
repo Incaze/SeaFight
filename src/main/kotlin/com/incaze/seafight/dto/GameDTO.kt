@@ -8,5 +8,7 @@ data class GameDTO (
         val partUserID: Long,
         val createrMap: String = "",
         val partMap: String = "",
+        val countCreaterShips: String = "",
+        val countPartShips: String = "",
         val winnerUserID: Long? = 0
 )

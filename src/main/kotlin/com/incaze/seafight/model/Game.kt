@@ -27,7 +27,12 @@ data class Game(
         @Column(name = "part_map")
         var partMap: String = "",
 
+        @Column(name = "countCreaterShips")
+        var countCreaterShips: String = "",
+
+        @Column(name = "countPartShips")
+        var countPartShips: String = "",
+
         @Column(name = "winner_user_id")
         var winnerUserID: Long? = null
-
 )
