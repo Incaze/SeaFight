@@ -50,4 +50,12 @@ class Utils {
         }
         return userMap.split(" ").toTypedArray()
     }
+
+    fun convertToString(arrayMap: Array<String?>) : String{
+        var stringMap = ""
+        for (i in arrayMap.indices){
+            stringMap = stringMap + arrayMap[i] + " "
+        }
+        return stringMap.substring(0, stringMap.length - 1)
+    }
 }

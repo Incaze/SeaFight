@@ -101,12 +101,12 @@ class GameController {
             val countUserShips = utils.convertMap(game.countCreaterShips, ship.getCountShipTypesFromNull())
             countUserShips[shipID!!] = (countUserShips[shipID]!!.toInt() + 1).toString()
             game.createrMap = gameMap
-            game.countCreaterShips = countUserShips.toString()
+            game.countCreaterShips = utils.convertToString(countUserShips)
         } else {
             val countUserShips = utils.convertMap(game.countPartShips, ship.getCountShipTypesFromNull())
             countUserShips[shipID!!] = (countUserShips[shipID]!!.toInt() + 1).toString()
             game.partMap = gameMap
-            game.countPartShips = countUserShips.toString()
+            game.countPartShips = utils.convertToString(countUserShips)
         }
 
         val creatorIsFinishFillMap = shipMap.isMapFillFinished(game.countCreaterShips)
@@ -174,10 +174,10 @@ class GameController {
         opponentMap = shipMap.applyMove(x_axis, y_axis, opponentMap)
         if (isCreatorUser) {
             game.partMap = opponentMap
-            game.countPartShips = countUserShips.toString()
+            game.countPartShips = utils.convertToString(countUserShips)
         } else {
             game.createrMap = opponentMap
-            game.countCreaterShips = countUserShips.toString()
+            game.countCreaterShips = utils.convertToString(countUserShips)
         }
 
         val gameOver = shipMap.isGameOver(countUserShips)

@@ -36,6 +36,7 @@ class ShipMap {
 
     private fun insertShip(arrayMap : Array<String?>, xAxis: Int, yAxis: Int, shipType: String, way: String, countUserShips: Array<String?>): String{
 
+        val utils = Utils()
         val ship = Ship()
 
         val error = "Can't insert ship"
@@ -78,7 +79,7 @@ class ShipMap {
                     && arrayMap[index - mapLen] == "0"
             ) {
                 arrayMap[index] = shipID.toString()
-                return arrayMap.toString()
+                return utils.convertToString(arrayMap)
             }
             return error
         }
@@ -97,7 +98,7 @@ class ShipMap {
                 arrayMap[tmp] = shipID.toString()
                 tmp += wayMapLen
             }
-            return arrayMap.toString()
+            return utils.convertToString(arrayMap)
     }
 
     fun isMapFillFinished(countUserShips: String) : Boolean{
@@ -142,7 +143,7 @@ class ShipMap {
         val arrayMap = utils.convertMap(gameMap, mapSize)
         val index = yAxis * mapLen + xAxis
         arrayMap[index] = "x"
-        return arrayMap.toString()
+        return utils.convertToString(arrayMap)
     }
 
     fun isGameOver(countUserShips: Array<String?>) : Boolean{
