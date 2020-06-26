@@ -6,7 +6,7 @@ import javax.persistence.*
 @Table(name = "game")
 data class Game(
         @Id
-        @GeneratedValue(strategy = GenerationType.SEQUENCE)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long? = null,
 
         @Column(name = "active")

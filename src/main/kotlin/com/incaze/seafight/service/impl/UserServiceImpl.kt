@@ -1,11 +1,13 @@
 package com.incaze.seafight.service.impl
 
 import com.incaze.seafight.dto.UserDTO
+import com.incaze.seafight.model.Role
 import com.incaze.seafight.model.User
 import com.incaze.seafight.service.UserService
 import com.incaze.seafight.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -16,12 +18,17 @@ class UserServiceImpl : UserService {
     @Autowired
     lateinit var userRepository: UserRepository
 
+    @Autowired
+    lateinit var encoder: PasswordEncoder
+
     override fun register(user: User): String {
-        if (!userRepository.existsByUsername(user.username.toString())) {
-            userRepository.save(user)
-            return "User ${user.username} successfully registered"
+        if (userRepository.existsByUsername(user.username.toString())){
+            return "User ${user.username} already exists"
         }
-        return "User ${user.username} already exist"
+        user.password = encoder.encode(user.password)
+        user.roles = mutableListOf(Role.USER)
+        userRepository.save(user)
+        return "User ${user.username} created"
     }
 
     override fun authorization(request: HttpServletRequest?,
@@ -32,14 +39,6 @@ class UserServiceImpl : UserService {
             return "Already authenticated"
         }
         return "Enter username and password"
-    }
-
-    override fun changeRoleToAdmin(username: String): String {
-        TODO("Not yet implemented")
-    }
-
-    override fun getUsers(): List<UserDTO> {
-        TODO("Not yet implemented")
     }
 
 }

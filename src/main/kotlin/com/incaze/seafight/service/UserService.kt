@@ -11,8 +11,4 @@ interface UserService {
     fun authorization(request: HttpServletRequest?,
                       response: HttpServletResponse?,
                       authentication: Authentication?): String
-
-    fun changeRoleToAdmin(username: String): String
-
-    fun getUsers(): List<UserDTO>
 }
